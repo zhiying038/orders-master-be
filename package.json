@@ -26,11 +26,15 @@
     "migration:revert": "npm run typeorm -- migration:revert"
   },
   "dependencies": {
+    "@nestjs/apollo": "^10.0.8",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.0.0",
     "@nestjs/core": "^8.0.0",
+    "@nestjs/graphql": "^10.0.8",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/typeorm": "^8.0.3",
+    "apollo-server-express": "^3.6.5",
+    "graphql": "^16.3.0",
     "mssql": "^6.4.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
