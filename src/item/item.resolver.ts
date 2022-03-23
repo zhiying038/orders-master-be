@@ -17,6 +17,13 @@ export class ItemResolver {
     return this.itemService.updateItem(input);
   }
 
+  @Mutation(() => Boolean)
+  async deleteItems(
+    @Args({ name: 'codes', type: () => [String] }) codes: string[],
+  ) {
+    return this.itemService.deleteItems(codes);
+  }
+
   @Query(() => ItemEntity)
   async getItemByCode(@Args('code') code: string): Promise<ItemEntity> {
     return this.itemService.getItemByCode(code);

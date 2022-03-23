@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
 import { PriceDto } from 'src/common/price.dto';
 import { ItemService } from 'src/item/item.service';
 import { CreateOrderDetailInput } from 'src/order-detail/dto/order-detail.input';
@@ -23,6 +23,13 @@ export class OrderResolver {
   @Query(() => [OrderEntity])
   async getOrders(): Promise<OrderEntity[]> {
     return this.orderService.getOrders();
+  }
+
+  @Query(() => OrderEntity)
+  async getOrderById(
+    @Args({ name: 'id', type: () => Int }) id: number,
+  ): Promise<OrderEntity> {
+    return this.orderService.getOrderById(id);
   }
 
   @Query(() => PriceDto)

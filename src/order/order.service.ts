@@ -42,4 +42,10 @@ export class OrderService {
       relations: ['orderDetails', 'orderDetails.item'],
     });
   }
+
+  async getOrderById(id: number): Promise<OrderEntity> {
+    return this.orderRepository.findOne(id, {
+      relations: ['orderDetails', 'orderDetails.item'],
+    });
+  }
 }

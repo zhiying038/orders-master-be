@@ -37,6 +37,7 @@ type Query {
   getItemByCode(code: String!): Item!
   getItems: [Item!]!
   getOrders: [Order!]!
+  getOrderById(id: Int!): Order!
   calculateTotalPrice(input: [CreateOrderDetailInput!]!): Price!
 }
 
@@ -49,6 +50,7 @@ input CreateOrderDetailInput {
 type Mutation {
   createItem(input: CreateItemInput!): Item!
   updateItem(input: UpdateItemInput!): Item!
+  deleteItems(codes: [String!]!): Boolean!
   createOrder(input: CreateOrderInput!): Order!
 }
 

@@ -31,6 +31,23 @@ export class ItemService {
     return result;
   }
 
+  async deleteItems(codes: string[]): Promise<boolean> {
+    try {
+      const result = await this.itemRepository
+        .createQueryBuilder('item')
+        .delete()
+        .from(ItemEntity)
+        .whereInIds(codes)
+        .execute();
+
+      if (result.affected > 0) {
+        return true;
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
   async getItemByCode(code: string): Promise<ItemEntity> {
     const item = await this.itemRepository.findOne({ code });
     if (!item) {
