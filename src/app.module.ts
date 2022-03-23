@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { ItemModule } from './item/item.module';
 
 @Module({
   imports: [
@@ -22,11 +23,13 @@ import { join } from 'path';
       synchronize: false,
       logging: true,
       migrationsRun: true,
+      migrationsTableName: 'MIGRATIONS',
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
+    ItemModule,
   ],
 })
 export class AppModule {}
