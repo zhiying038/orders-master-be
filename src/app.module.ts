@@ -5,6 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { ItemModule } from './item/item.module';
+import { OrderDetailModule } from './order-detail/order-detail.module';
 import { OrderModule } from './order/order.module';
 
 @Module({
@@ -32,6 +33,7 @@ import { OrderModule } from './order/order.module';
     }),
     ItemModule,
     OrderModule,
+    OrderDetailModule,
   ],
 })
 export class AppModule {}

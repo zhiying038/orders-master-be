@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateOrderDetailInput } from 'src/order-detail/dto/order-detail.input';
 import { Repository } from 'typeorm';
 import { CreateItemInput, UpdateItemInput } from './dto/item.input';
 import { ItemEntity } from './item.entity';
@@ -41,5 +42,20 @@ export class ItemService {
 
   async getItems(): Promise<ItemEntity[]> {
     return this.itemRepository.find();
+  }
+
+  async calculateTotalPrice(input: CreateOrderDetailInput[]): Promise<number> {
+    let total = 0;
+
+    await Promise.all(
+      input.map(async (item) => {
+        const found = await this.getItemByCode(item.itemCode);
+        total += found.price * item.quantity;
+
+        return total;
+      }),
+    );
+
+    return total;
   }
 }

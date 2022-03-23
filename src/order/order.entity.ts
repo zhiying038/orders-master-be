@@ -1,8 +1,10 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { OrderDetailEntity } from 'src/order-detail/order-detail.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -20,4 +22,10 @@ export class OrderEntity {
   @CreateDateColumn({ type: 'datetimeoffset', name: 'CreatedAt' })
   @Field()
   createdAt: Date;
+
+  @OneToMany(() => OrderDetailEntity, (detail) => detail.order, {
+    cascade: true,
+  })
+  @Field(() => [OrderDetailEntity], { nullable: true })
+  orderDetails?: OrderDetailEntity[];
 }
