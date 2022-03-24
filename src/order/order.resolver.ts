@@ -1,9 +1,10 @@
 import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
+import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
 import { PriceDto } from 'src/common/dto/price.dto';
 import { ItemService } from 'src/item/item.service';
 import { CreateOrderDetailInput } from 'src/order-detail/dto/order-detail.input';
-import { CreateOrderInput } from './dto/order.input';
-import { OrderEntity } from './order.entity';
+import { CreateOrderInput, FilterOrderInput } from './dto/order.input';
+import { OrderEntity, OrdersDto } from './order.entity';
 import { OrderService } from './order.service';
 
 @Resolver(() => OrderEntity)
@@ -21,8 +22,33 @@ export class OrderResolver {
   }
 
   @Query(() => [OrderEntity])
-  async getOrders(): Promise<OrderEntity[]> {
-    return this.orderService.getOrders();
+  async getOrders(
+    @Args({ name: 'filter', type: () => FilterOrderInput, nullable: true })
+    filter: FilterOrderInput,
+  ): Promise<OrderEntity[]> {
+    return this.orderService.getOrders(filter);
+  }
+
+  @Query(() => OrdersDto)
+  async getPaginatedOrders(
+    @Args({
+      name: 'options',
+      type: () => CommonFilterOptionInput,
+    })
+    options: CommonFilterOptionInput,
+    @Args({ name: 'filter', type: () => FilterOrderInput, nullable: true })
+    filter: FilterOrderInput,
+  ): Promise<OrdersDto> {
+    const { items, meta } = await this.orderService.getPaginatedOrders(
+      options,
+      filter,
+    );
+    return new OrdersDto(
+      items,
+      meta.totalItems,
+      meta.currentPage,
+      options.limit,
+    );
   }
 
   @Query(() => OrderEntity)

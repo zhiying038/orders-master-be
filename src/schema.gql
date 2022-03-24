@@ -21,6 +21,14 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Orders {
+  items: [Order!]!
+  total: Int!
+  hasMore: Boolean!
+  page: Int!
+  pages: Int!
+}
+
 type OrderDetail {
   id: String!
   quantity: Int!
@@ -36,9 +44,27 @@ type Price {
 type Query {
   getItemByCode(code: String!): Item!
   getItems: [Item!]!
-  getOrders: [Order!]!
+  getOrders(filter: FilterOrderInput): [Order!]!
+  getPaginatedOrders(options: CommonFilterOptionInput!, filter: FilterOrderInput): Orders!
   getOrderById(id: Int!): Order!
   calculateTotalPrice(input: [CreateOrderDetailInput!]!): Price!
+}
+
+input FilterOrderInput {
+  id: Int
+  createdAt: DateTime
+}
+
+input CommonFilterOptionInput {
+  page: Int = 1
+  limit: Int = 10
+  sortKey: String
+  sortOrder: SortOrder = ASC
+}
+
+enum SortOrder {
+  ASC
+  DESC
 }
 
 input CreateOrderDetailInput {
