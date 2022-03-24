@@ -1,5 +1,5 @@
 import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
-import { PriceDto } from 'src/common/price.dto';
+import { PriceDto } from 'src/common/dto/price.dto';
 import { ItemService } from 'src/item/item.service';
 import { CreateOrderDetailInput } from 'src/order-detail/dto/order-detail.input';
 import { CreateOrderInput } from './dto/order.input';
