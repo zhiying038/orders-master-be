@@ -1,4 +1,5 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { PaginatedResponseDto } from 'src/common/dto/paginated.dto';
 import { OrderDetailEntity } from 'src/order-detail/order-detail.entity';
 import {
   Column,
@@ -29,3 +30,6 @@ export class OrderEntity {
   @Field(() => [OrderDetailEntity], { nullable: true })
   orderDetails?: OrderDetailEntity[];
 }
+
+@ObjectType('Orders')
+export class OrdersDto extends PaginatedResponseDto(() => [OrderEntity]) {}

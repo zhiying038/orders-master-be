@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
 import { ItemService } from 'src/item/item.service';
 import { OrderDetailEntity } from 'src/order-detail/order-detail.entity';
-import { Repository } from 'typeorm';
-import { CreateOrderInput } from './dto/order.input';
+import { Repository, SelectQueryBuilder } from 'typeorm';
+import { CreateOrderInput, FilterOrderInput } from './dto/order.input';
 import { OrderEntity } from './order.entity';
 
 @Injectable()
@@ -37,15 +39,45 @@ export class OrderService {
     return this.orderRepository.save(order);
   }
 
-  async getOrders(): Promise<OrderEntity[]> {
-    return this.orderRepository.find({
-      relations: ['orderDetails', 'orderDetails.item'],
-    });
+  async getOrders(filter: FilterOrderInput): Promise<OrderEntity[]> {
+    const query = await this.filterOrders('order', filter);
+    return query.getMany();
+  }
+
+  async getPaginatedOrders(
+    options: CommonFilterOptionInput,
+    filter: FilterOrderInput,
+  ): Promise<Pagination<OrderEntity>> {
+    const query = await this.filterOrders('order', filter);
+    return paginate<OrderEntity>(query, options);
   }
 
   async getOrderById(id: number): Promise<OrderEntity> {
     return this.orderRepository.findOne(id, {
       relations: ['orderDetails', 'orderDetails.item'],
     });
+  }
+
+  private async filterOrders(
+    tableName: string,
+    filter: FilterOrderInput,
+  ): Promise<SelectQueryBuilder<OrderEntity>> {
+    const query = this.orderRepository
+      .createQueryBuilder(tableName)
+      .leftJoinAndSelect(`${tableName}.orderDetails`, 'orderDetails')
+      .leftJoinAndSelect('orderDetails.item', 'item');
+
+    if (filter) {
+      const { id, createdAt } = filter;
+      if (id) query.andWhere(`${tableName}.id = :id`, { id });
+      if (createdAt) {
+        query.andWhere(
+          `${tableName}.createdAt >= :date AND ${tableName}.createdAt < DATEADD(day, 1, :date)`,
+          { date: createdAt },
+        );
+      }
+    }
+
+    return query;
   }
 }
