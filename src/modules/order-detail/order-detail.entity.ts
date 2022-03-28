@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { OrderEntity } from 'src/modules/order/order.entity';
 import {
   Column,
@@ -15,6 +15,10 @@ export class OrderDetailEntity {
   @PrimaryGeneratedColumn('uuid', { name: 'Id' })
   @Field()
   id: string;
+
+  @Column({ name: 'UnitPrice', type: 'float' })
+  @Field(() => Float)
+  unitPrice: number;
 
   @Column({ name: 'Quantity', type: 'int' })
   @Field(() => Int)

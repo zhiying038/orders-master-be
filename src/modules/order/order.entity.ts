@@ -1,4 +1,4 @@
-import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, ObjectType } from '@nestjs/graphql';
 import { PaginatedResponseDto } from 'src/common/dto/paginated.dto';
 import { OrderDetailEntity } from 'src/modules/order-detail/order-detail.entity';
 import {
@@ -12,13 +12,19 @@ import {
 @Entity({ name: 'ORDERS' })
 @ObjectType('Order')
 export class OrderEntity {
-  @PrimaryGeneratedColumn({ name: 'Id' })
-  @Field(() => Int)
-  id: number;
+  @PrimaryGeneratedColumn('uuid', { name: 'Id' })
+  id: string;
+
+  @Column({ name: 'ReferenceNumber' })
+  referenceNumber: string;
 
   @Column({ type: 'float', name: 'TotalPrice' })
   @Field(() => Float)
   totalPrice: number;
+
+  @Column({ default: 'MYR' })
+  @Field()
+  currency: string;
 
   @CreateDateColumn({ type: 'datetimeoffset', name: 'CreatedAt' })
   @Field()

@@ -1,33 +1,19 @@
 import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
 import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
 import { PriceDto } from 'src/common/dto/price.dto';
-import { CreateOrderDetailInput } from 'src/modules/order-detail/dto/order-detail.input';
-import { ItemService } from '../item/item.service';
-import { FilterOrderInput } from './dto/order.input';
+import { FilterOrderInput, PlaceOrderInput } from './dto/order.input';
 import { OrderEntity, OrdersDto } from './order.entity';
 import { OrderService } from './order.service';
 
 @Resolver(() => OrderEntity)
 export class OrderResolver {
-  constructor(
-    private orderService: OrderService,
-    private itemService: ItemService,
-  ) {}
+  constructor(private orderService: OrderService) {}
 
   @Mutation(() => OrderEntity)
   async createOrder(
-    @Args({ name: 'input', type: () => [CreateOrderDetailInput] })
-    input: CreateOrderDetailInput[],
+    @Args('input') input: PlaceOrderInput,
   ): Promise<OrderEntity> {
-    return this.orderService.createOrder(input);
-  }
-
-  @Query(() => [OrderEntity])
-  async getOrders(
-    @Args({ name: 'filter', type: () => FilterOrderInput, nullable: true })
-    filter: FilterOrderInput,
-  ): Promise<OrderEntity[]> {
-    return this.orderService.getOrders(filter);
+    return this.orderService.placeOrder(input);
   }
 
   @Query(() => OrdersDto)
@@ -61,10 +47,9 @@ export class OrderResolver {
 
   @Query(() => PriceDto)
   async calculateTotalPrice(
-    @Args({ name: 'input', type: () => [CreateOrderDetailInput] })
-    input: CreateOrderDetailInput[],
+    @Args('input') input: PlaceOrderInput,
   ): Promise<PriceDto> {
-    const total = await this.itemService.calculateTotalPrice(input);
+    const total = this.orderService.calculateTotalAmount(input);
     return { currency: 'MYR', price: total };
   }
 }

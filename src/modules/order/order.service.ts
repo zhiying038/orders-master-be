@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import moment from 'moment';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
-import { CreateOrderDetailInput } from 'src/modules/order-detail/dto/order-detail.input';
 import { OrderDetailEntity } from 'src/modules/order-detail/order-detail.entity';
+import { Price } from 'src/utils/price';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ItemService } from '../item/item.service';
-import { FilterOrderInput } from './dto/order.input';
+import { GetNewRunningNumberQuery } from '../running-number/cqrs/running-number.query';
+import { FilterOrderInput, PlaceOrderInput } from './dto/order.input';
 import { OrderEntity } from './order.entity';
 
 @Injectable()
@@ -15,12 +18,15 @@ export class OrderService {
     @InjectRepository(OrderEntity)
     private orderRepository: Repository<OrderEntity>,
     private itemService: ItemService,
+    private queryBus: QueryBus,
   ) {}
 
-  async createOrder(input: CreateOrderDetailInput[]): Promise<OrderEntity> {
-    const totalPrice = await this.itemService.calculateTotalPrice(input);
+  async placeOrder(input: PlaceOrderInput): Promise<OrderEntity> {
+    const { orders, createdAt } = input;
+
+    const totalAmount = this.calculateTotalAmount(input);
     const items = await Promise.all(
-      input.map(async (item) => {
+      orders.map(async (item) => {
         const foundItem = await this.itemService.getItemByCode(item.itemCode);
 
         const detail = new OrderDetailEntity();
@@ -31,16 +37,7 @@ export class OrderService {
       }),
     );
 
-    const order = new OrderEntity();
-    order.orderDetails = items;
-    order.totalPrice = totalPrice;
-
-    return this.orderRepository.save(order);
-  }
-
-  async getOrders(filter: FilterOrderInput): Promise<OrderEntity[]> {
-    const query = await this.filterOrders('order', filter);
-    return query.getMany();
+    return await this.createOrder(items, createdAt, totalAmount);
   }
 
   async getPaginatedOrders(
@@ -55,6 +52,37 @@ export class OrderService {
     return this.orderRepository.findOne(id, {
       relations: ['orderDetails', 'orderDetails.item'],
     });
+  }
+
+  private async createOrder(
+    items: OrderDetailEntity[],
+    orderDate: Date,
+    totalPrice: number,
+  ): Promise<OrderEntity> {
+    const refNum = await this.prepareReferenceNumber();
+    const placedDate = orderDate ?? moment().toDate();
+
+    const newOrder = this.orderRepository.create({
+      referenceNumber: refNum,
+      orderDetails: items,
+      totalPrice,
+      createdAt: placedDate,
+    });
+
+    return await this.orderRepository.save(newOrder);
+  }
+
+  calculateTotalAmount(input: PlaceOrderInput): number {
+    const total = input.orders.reduce((a, b) => a + b.unitPrice, 0) || 0;
+    return Price.formatPrice(total);
+  }
+
+  private async prepareReferenceNumber(): Promise<string> {
+    const purpose = 'ORDER';
+    const refNumber = await this.queryBus.execute(
+      new GetNewRunningNumberQuery(purpose),
+    );
+    return `#${refNumber.toString().padStart(8, 0)}`;
   }
 
   private async filterOrders(
