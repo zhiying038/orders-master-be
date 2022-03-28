@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
-import { ItemService } from 'src/item/item.service';
-import { CreateOrderDetailInput } from 'src/order-detail/dto/order-detail.input';
-import { OrderDetailEntity } from 'src/order-detail/order-detail.entity';
+import { CreateOrderDetailInput } from 'src/modules/order-detail/dto/order-detail.input';
+import { OrderDetailEntity } from 'src/modules/order-detail/order-detail.entity';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { ItemService } from '../item/item.service';
 import { FilterOrderInput } from './dto/order.input';
 import { OrderEntity } from './order.entity';
 

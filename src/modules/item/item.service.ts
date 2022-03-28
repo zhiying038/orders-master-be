@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateOrderDetailInput } from 'src/order-detail/dto/order-detail.input';
+import { CreateOrderDetailInput } from 'src/modules/order-detail/dto/order-detail.input';
 import { Repository } from 'typeorm';
 import { CreateItemInput, UpdateItemInput } from './dto/item.input';
 import { ItemEntity } from './item.entity';

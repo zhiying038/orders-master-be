@@ -1,8 +1,8 @@
 import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
 import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
 import { PriceDto } from 'src/common/dto/price.dto';
-import { ItemService } from 'src/item/item.service';
-import { CreateOrderDetailInput } from 'src/order-detail/dto/order-detail.input';
+import { CreateOrderDetailInput } from 'src/modules/order-detail/dto/order-detail.input';
+import { ItemService } from '../item/item.service';
 import { FilterOrderInput } from './dto/order.input';
 import { OrderEntity, OrdersDto } from './order.entity';
 import { OrderService } from './order.service';

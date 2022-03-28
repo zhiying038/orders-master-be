@@ -4,10 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
-import { ItemModule } from './item/item.module';
-import { OrderDetailModule } from './order-detail/order-detail.module';
-import { OrderModule } from './order/order.module';
-import { RunnningNumberModule } from './running-number/runnning-number.module';
+import { ItemModule } from './modules/item/item.module';
+import { OrderDetailModule } from './modules/order-detail/order-detail.module';
+import { OrderModule } from './modules/order/order.module';
+import { RunnningNumberModule } from './modules/running-number/runnning-number.module';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { RunnningNumberModule } from './running-number/runnning-number.module';
       password: process.env.DB_PASSWORD,
       port: Number(process.env.DB_PORT),
       database: process.env.DB_DATABASE,
-      entities: ['dist/**/*.entity{.ts,.js}'],
+      entities: ['dist/modules/**/*.entity{.ts,.js}'],
       synchronize: false,
       logging: true,
       migrationsRun: true,
