@@ -13,16 +13,18 @@ import {
 @ObjectType('Order')
 export class OrderEntity {
   @PrimaryGeneratedColumn('uuid', { name: 'Id' })
+  @Field()
   id: string;
 
   @Column({ name: 'ReferenceNumber' })
+  @Field()
   referenceNumber: string;
 
   @Column({ type: 'float', name: 'TotalPrice' })
   @Field(() => Float)
   totalPrice: number;
 
-  @Column({ default: 'MYR' })
+  @Column({ default: 'MYR', name: 'Currency' })
   @Field()
   currency: string;
 

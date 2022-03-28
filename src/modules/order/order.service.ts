@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import moment from 'moment';
+import * as moment from 'moment';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
 import { OrderDetailEntity } from 'src/modules/order-detail/order-detail.entity';
@@ -32,6 +32,7 @@ export class OrderService {
         const detail = new OrderDetailEntity();
         detail.item = foundItem;
         detail.quantity = item.quantity;
+        detail.unitPrice = item.unitPrice;
 
         return detail;
       }),
@@ -73,7 +74,8 @@ export class OrderService {
   }
 
   calculateTotalAmount(input: PlaceOrderInput): number {
-    const total = input.orders.reduce((a, b) => a + b.unitPrice, 0) || 0;
+    const total =
+      input.orders.reduce((a, b) => a + b.unitPrice * b.quantity, 0) || 0;
     return Price.formatPrice(total);
   }
 

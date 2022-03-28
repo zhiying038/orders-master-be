@@ -22,7 +22,7 @@ import { RunnningNumberModule } from './modules/running-number/runnning-number.m
       password: process.env.DB_PASSWORD,
       port: Number(process.env.DB_PORT),
       database: process.env.DB_DATABASE,
-      entities: ['dist/modules/**/*.entity{.ts,.js}'],
+      entities: ['dist/src/modules/**/*.entity{.ts,.js}'],
       synchronize: false,
       logging: true,
       migrationsRun: true,

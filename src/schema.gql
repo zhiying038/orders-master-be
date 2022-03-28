@@ -10,8 +10,10 @@ type Item {
 }
 
 type Order {
-  id: Int!
+  id: String!
+  referenceNumber: String!
   totalPrice: Float!
+  currency: String!
   createdAt: DateTime!
   orderDetails: [OrderDetail!]
 }
@@ -31,6 +33,7 @@ type Orders {
 
 type OrderDetail {
   id: String!
+  unitPrice: Float!
   quantity: Int!
   item: Item!
   order: Order!
@@ -44,15 +47,9 @@ type Price {
 type Query {
   getItemByCode(code: String!): Item!
   getItems: [Item!]!
-  getOrders(filter: FilterOrderInput): [Order!]!
   getPaginatedOrders(options: CommonFilterOptionInput!, filter: FilterOrderInput): Orders!
   getOrderById(id: Int!): Order!
-  calculateTotalPrice(input: [CreateOrderDetailInput!]!): Price!
-}
-
-input FilterOrderInput {
-  id: Int
-  createdAt: DateTime
+  calculateTotalPrice(input: PlaceOrderInput!): Price!
 }
 
 input CommonFilterOptionInput {
@@ -67,8 +64,19 @@ enum SortOrder {
   DESC
 }
 
+input FilterOrderInput {
+  id: Int
+  createdAt: DateTime
+}
+
+input PlaceOrderInput {
+  createdAt: DateTime
+  orders: [CreateOrderDetailInput!]!
+}
+
 input CreateOrderDetailInput {
   quantity: Int!
+  unitPrice: Float!
   itemCode: String!
   orderId: Float
 }
@@ -77,7 +85,7 @@ type Mutation {
   createItem(input: CreateItemInput!): Item!
   updateItem(input: UpdateItemInput!): Item!
   deleteItems(codes: [String!]!): Boolean!
-  createOrder(input: [CreateOrderDetailInput!]!): Order!
+  createOrder(input: PlaceOrderInput!): Order!
 }
 
 input CreateItemInput {
