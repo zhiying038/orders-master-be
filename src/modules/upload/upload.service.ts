@@ -1,26 +1,30 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { S3, config } from 'aws-sdk';
 import { has } from 'lodash';
-import mime from 'mime-types';
+import * as mime from 'mime-types';
 import { UploadPurpose } from 'src/common/constants/upload-purpose';
-import { ApiConfigService } from 'src/shared/services/api-config.service';
 import { GeneratorService } from 'src/shared/services/generator.service';
 import { ValidatorService } from 'src/shared/services/validator.service';
 import { CreateUploadInput } from './dto/upload.input';
 import { SignedUrlDto } from './dto/upload.dto';
-import { FirebaseAdmin, InjectFirebaseAdmin } from 'nestjs-firebase';
 
 @Injectable()
 export class UploadService {
   constructor(
-    public configService: ApiConfigService,
     public validatorService: ValidatorService,
     public generatorService: GeneratorService,
-    @InjectFirebaseAdmin() private readonly firebase: FirebaseAdmin,
   ) {}
 
   async generateSignedUrl(input: CreateUploadInput): Promise<SignedUrlDto> {
+    const s3 = new S3();
+    config.update({
+      accessKeyId: process.env.AWS_S3_ACCESS_KEY,
+      secretAccessKey: process.env.AWS_S3_SECRET_KEY,
+      region: process.env.AWS_S3_REGION,
+    });
+
     const whitelistPurpose = {
-      [UploadPurpose.IMAGE]: 'i',
+      [UploadPurpose.IMAGE]: 'images',
     };
 
     const { mimeType, purpose } = input;
@@ -28,28 +32,31 @@ export class UploadService {
       throw new BadRequestException('Invalid upload purpose');
     }
 
-    if (has({ [UploadPurpose.IMAGE]: 'i' }, purpose)) {
+    if (has({ [UploadPurpose.IMAGE]: 'images' }, purpose)) {
       if (!this.validatorService.isImage(mimeType)) {
         throw new BadRequestException('Invalid upload file mime type');
       }
     }
 
     const folderName = whitelistPurpose[purpose];
-    // const fileExtension = mime.contentType(mimeType);
-    const fileName = this.generatorService.fileName('jpeg');
+    const fileExtension = mime.extension(mimeType) as string;
+    const fileName = this.generatorService.fileName(fileExtension);
+    const filePath = `${folderName}/${fileName}`;
+    const bucketName = process.env.AWS_S3_BUCKET;
 
-    const [url] = await this.firebase.storage
-      .bucket('gs://ft-orders.appspot.com')
-      .file(`${folderName}/${fileName}`)
-      .getSignedUrl({
-        action: 'write',
-        expires: Date.now() + 1000 * 60 * 10,
-        version: 'v4',
-        contentType: mimeType,
+    try {
+      const signedUrl = s3.getSignedUrl('putObject', {
+        Bucket: bucketName,
+        Key: filePath,
+        Expires: 3600,
+        ContentType: mimeType,
       });
 
-    const results = new SignedUrlDto();
-    results.signedUrl = url;
-    return results;
+      const results = new SignedUrlDto();
+      results.signedUrl = signedUrl;
+      return results;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }
