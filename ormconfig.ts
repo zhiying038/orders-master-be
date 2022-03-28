@@ -7,7 +7,7 @@ const options: TypeOrmModuleOptions = {
   password: process.env.DB_PASSWORD,
   port: Number(process.env.DB_PORT),
   database: process.env.DB_DATABASE,
-  entities: ['src/**/*.entity{.ts,.js}'],
+  entities: ['src/modules/**/*.entity{.ts,.js}'],
   migrations: ['src/migrations/*{.ts,.js}'],
   migrationsTableName: 'MIGRATIONS',
 };
