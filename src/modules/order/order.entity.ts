@@ -16,6 +16,14 @@ export class OrderEntity {
   @Field()
   id: string;
 
+  @CreateDateColumn({ type: 'datetimeoffset', name: 'CreatedAt' })
+  @Field()
+  createdAt: Date;
+
+  @Column({ name: 'PlacedAt', type: 'date' })
+  @Field()
+  placedAt: Date;
+
   @Column({ name: 'ReferenceNumber' })
   @Field()
   referenceNumber: string;
@@ -27,10 +35,6 @@ export class OrderEntity {
   @Column({ default: 'MYR', name: 'Currency' })
   @Field()
   currency: string;
-
-  @CreateDateColumn({ type: 'datetimeoffset', name: 'CreatedAt' })
-  @Field()
-  createdAt: Date;
 
   @OneToMany(() => OrderDetailEntity, (detail) => detail.order, {
     cascade: true,

@@ -1,4 +1,6 @@
 import { Field, Float, InputType, PartialType } from '@nestjs/graphql';
+import { Allow } from 'class-validator';
+import { AddItemImageInput } from '../item-image/dto/item-image.input';
 
 @InputType('CreateItemInput')
 export class CreateItemInput {
@@ -13,6 +15,10 @@ export class CreateItemInput {
 
   @Field({ nullable: true })
   currency?: string;
+
+  @Allow()
+  @Field(() => [AddItemImageInput], { nullable: true })
+  images?: AddItemImageInput[];
 }
 
 @InputType('UpdateItemInput')

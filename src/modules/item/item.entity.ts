@@ -1,10 +1,15 @@
 import { Field, Float, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ItemImageEntity } from './item-image/item-image.entity';
 
 @Entity({ name: 'ITEMS' })
 @ObjectType('Item')
 export class ItemEntity {
-  @PrimaryColumn({ name: 'Code' })
+  @PrimaryGeneratedColumn('uuid', { name: 'Id' })
+  @Field()
+  id: string;
+
+  @Column({ name: 'Code' })
   @Field()
   code: string;
 
@@ -19,4 +24,8 @@ export class ItemEntity {
   @Column({ name: 'Currency', default: 'MYR' })
   @Field()
   currency: string;
+
+  @OneToMany(() => ItemImageEntity, (image) => image.item, { cascade: true })
+  @Field(() => [ItemImageEntity], { nullable: true })
+  images?: ItemImageEntity[];
 }

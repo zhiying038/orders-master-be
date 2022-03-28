@@ -2,19 +2,29 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type ItemImage {
+  id: String!
+  link: String!
+  alt: String
+  item: Item!
+}
+
 type Item {
+  id: String!
   code: String!
   name: String!
   price: Float!
   currency: String!
+  images: [ItemImage!]
 }
 
 type Order {
   id: String!
+  createdAt: DateTime!
+  placedAt: DateTime!
   referenceNumber: String!
   totalPrice: Float!
   currency: String!
-  createdAt: DateTime!
   orderDetails: [OrderDetail!]
 }
 
@@ -65,12 +75,12 @@ enum SortOrder {
 }
 
 input FilterOrderInput {
-  id: Int
-  createdAt: DateTime
+  orderId: Float
+  placedAt: DateTime
 }
 
 input PlaceOrderInput {
-  createdAt: DateTime
+  placedAt: DateTime
   orders: [CreateOrderDetailInput!]!
 }
 
@@ -93,6 +103,12 @@ input CreateItemInput {
   name: String!
   price: Float!
   currency: String
+  images: [AddItemImageInput!]
+}
+
+input AddItemImageInput {
+  link: String!
+  alt: String
 }
 
 input UpdateItemInput {
@@ -100,4 +116,5 @@ input UpdateItemInput {
   name: String
   price: Float
   currency: String
+  images: [AddItemImageInput!]
 }

@@ -22,7 +22,7 @@ export class OrderService {
   ) {}
 
   async placeOrder(input: PlaceOrderInput): Promise<OrderEntity> {
-    const { orders, createdAt } = input;
+    const { orders, placedAt } = input;
 
     const totalAmount = this.calculateTotalAmount(input);
     const items = await Promise.all(
@@ -38,7 +38,7 @@ export class OrderService {
       }),
     );
 
-    return await this.createOrder(items, createdAt, totalAmount);
+    return await this.createOrder(items, placedAt, totalAmount);
   }
 
   async getPaginatedOrders(
@@ -61,13 +61,13 @@ export class OrderService {
     totalPrice: number,
   ): Promise<OrderEntity> {
     const refNum = await this.prepareReferenceNumber();
-    const placedDate = orderDate ?? moment().toDate();
+    const placedDate = orderDate ?? moment().format('YYYY-MM-DD');
 
     const newOrder = this.orderRepository.create({
       referenceNumber: refNum,
       orderDetails: items,
       totalPrice,
-      createdAt: placedDate,
+      placedAt: placedDate,
     });
 
     return await this.orderRepository.save(newOrder);
@@ -97,12 +97,16 @@ export class OrderService {
       .leftJoinAndSelect('orderDetails.item', 'item');
 
     if (filter) {
-      const { id, createdAt } = filter;
-      if (id) query.andWhere(`${tableName}.id = :id`, { id });
-      if (createdAt) {
+      const { orderId, placedAt } = filter;
+      if (orderId)
+        query.andWhere(`${tableName}.referenceNumber ILIKE :referenceNumber`, {
+          referenceNumber: `%${orderId}%`,
+        });
+
+      if (placedAt) {
         query.andWhere(
-          `${tableName}.createdAt >= :date AND ${tableName}.createdAt < DATEADD(day, 1, :date)`,
-          { date: createdAt },
+          `${tableName}.placedAt >= :placedAt AND ${tableName}.placedAt < DATEADD(day, 1, :placedAt)`,
+          { date: placedAt },
         );
       }
     }

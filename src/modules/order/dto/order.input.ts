@@ -1,4 +1,4 @@
-import { Field, InputType, Int } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 import { Allow } from 'class-validator';
 import { CreateOrderDetailInput } from 'src/modules/order-detail/dto/order-detail.input';
 
@@ -6,7 +6,7 @@ import { CreateOrderDetailInput } from 'src/modules/order-detail/dto/order-detai
 export class PlaceOrderInput {
   @Allow()
   @Field({ nullable: true })
-  createdAt?: Date;
+  placedAt?: Date;
 
   @Allow()
   @Field(() => [CreateOrderDetailInput])
@@ -20,15 +20,19 @@ export class CreateOrderInput {
   referenceNumber: string;
 
   @Allow()
+  @Field()
+  placedAt: Date;
+
+  @Allow()
   @Field(() => [CreateOrderDetailInput])
   orderItems: CreateOrderDetailInput[];
 }
 
 @InputType('FilterOrderInput')
 export class FilterOrderInput {
-  @Field(() => Int, { nullable: true })
-  id?: number;
+  @Field({ nullable: true })
+  orderId?: number;
 
   @Field({ nullable: true })
-  createdAt?: Date;
+  placedAt?: Date;
 }

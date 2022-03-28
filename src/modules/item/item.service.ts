@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateOrderDetailInput } from 'src/modules/order-detail/dto/order-detail.input';
 import { Repository } from 'typeorm';
 import { CreateItemInput, UpdateItemInput } from './dto/item.input';
 import { ItemEntity } from './item.entity';
@@ -13,7 +12,12 @@ export class ItemService {
   ) {}
 
   async createItem(input: CreateItemInput): Promise<ItemEntity> {
-    const newItem = this.itemRepository.create(input);
+    const { images, ...restInputs } = input;
+
+    const newItem = this.itemRepository.create({
+      ...restInputs,
+      images,
+    });
     return this.itemRepository.save(newItem);
   }
 
@@ -31,13 +35,12 @@ export class ItemService {
     return result;
   }
 
-  async deleteItems(codes: string[]): Promise<boolean> {
+  async deleteItems(ids: string[]): Promise<boolean> {
     try {
       const result = await this.itemRepository
         .createQueryBuilder('item')
         .delete()
-        .from(ItemEntity)
-        .whereInIds(codes)
+        .whereInIds(ids)
         .execute();
 
       if (result.affected > 0) {
@@ -49,7 +52,10 @@ export class ItemService {
   }
 
   async getItemByCode(code: string): Promise<ItemEntity> {
-    const item = await this.itemRepository.findOne({ code });
+    const item = await this.itemRepository.findOne({
+      where: { code },
+      relations: ['images'],
+    });
     if (!item) {
       throw new NotFoundException('Failed to find item');
     }
@@ -58,21 +64,6 @@ export class ItemService {
   }
 
   async getItems(): Promise<ItemEntity[]> {
-    return this.itemRepository.find();
-  }
-
-  async calculateTotalPrice(input: CreateOrderDetailInput[]): Promise<number> {
-    let total = 0;
-
-    await Promise.all(
-      input.map(async (item) => {
-        const found = await this.getItemByCode(item.itemCode);
-        total += found.price * item.quantity;
-
-        return total;
-      }),
-    );
-
-    return total;
+    return this.itemRepository.find({ relations: ['images'] });
   }
 }
