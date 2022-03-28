@@ -54,6 +54,10 @@ type Price {
   price: Float!
 }
 
+type SignedUrl {
+  signedUrl: String
+}
+
 type Query {
   getItemByCode(code: String!): Item!
   getItems: [Item!]!
@@ -96,6 +100,7 @@ type Mutation {
   updateItem(input: UpdateItemInput!): Item!
   deleteItems(codes: [String!]!): Boolean!
   createOrder(input: PlaceOrderInput!): Order!
+  generateSignedUrl(input: CreateUploadInput!): SignedUrl!
 }
 
 input CreateItemInput {
@@ -117,4 +122,13 @@ input UpdateItemInput {
   price: Float
   currency: String
   images: [AddItemImageInput!]
+}
+
+input CreateUploadInput {
+  purpose: UploadPurpose!
+  mimeType: String!
+}
+
+enum UploadPurpose {
+  IMAGE
 }

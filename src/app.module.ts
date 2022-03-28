@@ -3,11 +3,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { FirebaseModule } from 'nestjs-firebase';
 import { join } from 'path';
 import { ItemModule } from './modules/item/item.module';
 import { OrderDetailModule } from './modules/order-detail/order-detail.module';
 import { OrderModule } from './modules/order/order.module';
 import { RunnningNumberModule } from './modules/running-number/runnning-number.module';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -32,10 +34,14 @@ import { RunnningNumberModule } from './modules/running-number/runnning-number.m
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
+    FirebaseModule.forRoot({
+      googleApplicationCredential: process.env.FIREBASE_UPLOAD_KEY_FILENAME,
+    }),
     ItemModule,
     OrderModule,
     OrderDetailModule,
     RunnningNumberModule,
+    UploadModule,
   ],
 })
 export class AppModule {}
