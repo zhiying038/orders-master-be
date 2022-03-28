@@ -3,7 +3,7 @@ import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
 import { PriceDto } from 'src/common/dto/price.dto';
 import { ItemService } from 'src/item/item.service';
 import { CreateOrderDetailInput } from 'src/order-detail/dto/order-detail.input';
-import { CreateOrderInput, FilterOrderInput } from './dto/order.input';
+import { FilterOrderInput } from './dto/order.input';
 import { OrderEntity, OrdersDto } from './order.entity';
 import { OrderService } from './order.service';
 
@@ -16,7 +16,8 @@ export class OrderResolver {
 
   @Mutation(() => OrderEntity)
   async createOrder(
-    @Args('input') input: CreateOrderInput,
+    @Args({ name: 'input', type: () => [CreateOrderDetailInput] })
+    input: CreateOrderDetailInput[],
   ): Promise<OrderEntity> {
     return this.orderService.createOrder(input);
   }

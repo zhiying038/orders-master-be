@@ -77,7 +77,7 @@ type Mutation {
   createItem(input: CreateItemInput!): Item!
   updateItem(input: UpdateItemInput!): Item!
   deleteItems(codes: [String!]!): Boolean!
-  createOrder(input: CreateOrderInput!): Order!
+  createOrder(input: [CreateOrderDetailInput!]!): Order!
 }
 
 input CreateItemInput {
@@ -92,9 +92,4 @@ input UpdateItemInput {
   name: String
   price: Float
   currency: String
-}
-
-input CreateOrderInput {
-  totalPrice: Float
-  orderDetails: [CreateOrderDetailInput!]!
 }

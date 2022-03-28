@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
 import { ItemService } from 'src/item/item.service';
+import { CreateOrderDetailInput } from 'src/order-detail/dto/order-detail.input';
 import { OrderDetailEntity } from 'src/order-detail/order-detail.entity';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { CreateOrderInput, FilterOrderInput } from './dto/order.input';
+import { FilterOrderInput } from './dto/order.input';
 import { OrderEntity } from './order.entity';
 
 @Injectable()
@@ -16,12 +17,10 @@ export class OrderService {
     private itemService: ItemService,
   ) {}
 
-  async createOrder(input: CreateOrderInput): Promise<OrderEntity> {
-    const { orderDetails } = input;
-
-    const totalPrice = await this.itemService.calculateTotalPrice(orderDetails);
+  async createOrder(input: CreateOrderDetailInput[]): Promise<OrderEntity> {
+    const totalPrice = await this.itemService.calculateTotalPrice(input);
     const items = await Promise.all(
-      orderDetails.map(async (item) => {
+      input.map(async (item) => {
         const foundItem = await this.itemService.getItemByCode(item.itemCode);
 
         const detail = new OrderDetailEntity();
