@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindConditions, Repository } from 'typeorm';
 import { CreateItemInput, UpdateItemInput } from './dto/item.input';
 import { ItemEntity } from './item.entity';
 
@@ -51,19 +51,20 @@ export class ItemService {
     }
   }
 
-  async getItemByCode(code: string): Promise<ItemEntity> {
-    const item = await this.itemRepository.findOne({
-      where: { code },
-      relations: ['images'],
-    });
-    if (!item) {
-      throw new NotFoundException('Failed to find item');
-    }
-
-    return item;
-  }
-
   async getItems(): Promise<ItemEntity[]> {
     return this.itemRepository.find({ relations: ['images'] });
+  }
+
+  async findOne(
+    condition: FindConditions<ItemEntity>,
+    nullable = true,
+  ): Promise<ItemEntity> {
+    const item = await this.itemRepository.findOne(condition, {
+      relations: ['images'],
+    });
+    if (!item && !nullable) {
+      throw new NotFoundException(`Failed to find item`);
+    }
+    return item;
   }
 }

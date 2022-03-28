@@ -24,11 +24,6 @@ export class ItemResolver {
     return this.itemService.deleteItems(codes);
   }
 
-  @Query(() => ItemEntity)
-  async getItemByCode(@Args('code') code: string): Promise<ItemEntity> {
-    return this.itemService.getItemByCode(code);
-  }
-
   @Query(() => [ItemEntity])
   async getItems(): Promise<ItemEntity[]> {
     return this.itemService.getItems();

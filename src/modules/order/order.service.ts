@@ -2,22 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
-import { paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { paginate } from 'nestjs-typeorm-paginate';
 import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
 import { OrderDetailEntity } from 'src/modules/order-detail/order-detail.entity';
 import { Price } from 'src/utils/price';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { ItemService } from '../item/item.service';
+import { GetItemQuery } from '../item/cqrs/item.query';
 import { GetNewRunningNumberQuery } from '../running-number/cqrs/running-number.query';
 import { FilterOrderInput, PlaceOrderInput } from './dto/order.input';
-import { OrderEntity } from './order.entity';
+import { OrderEntity, OrdersDto } from './order.entity';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectRepository(OrderEntity)
     private orderRepository: Repository<OrderEntity>,
-    private itemService: ItemService,
     private queryBus: QueryBus,
   ) {}
 
@@ -27,7 +26,9 @@ export class OrderService {
     const totalAmount = this.calculateTotalAmount(input);
     const items = await Promise.all(
       orders.map(async (item) => {
-        const foundItem = await this.itemService.getItemByCode(item.itemCode);
+        const foundItem = await this.queryBus.execute(
+          new GetItemQuery({ code: item.itemCode }),
+        );
 
         const detail = new OrderDetailEntity();
         detail.item = foundItem;
@@ -44,9 +45,15 @@ export class OrderService {
   async getPaginatedOrders(
     options: CommonFilterOptionInput,
     filter: FilterOrderInput,
-  ): Promise<Pagination<OrderEntity>> {
+  ): Promise<OrdersDto> {
     const query = await this.filterOrders('order', filter);
-    return paginate<OrderEntity>(query, options);
+    const { items, meta } = await paginate<OrderEntity>(query, options);
+    return new OrdersDto(
+      items,
+      meta.totalItems,
+      meta.currentPage,
+      options.limit,
+    );
   }
 
   async getOrderById(id: number): Promise<OrderEntity> {

@@ -20,3 +20,6 @@ export class CreateItemInput {
 export class UpdateItemInput extends PartialType(CreateItemInput) {
   code: string;
 }
+
+@InputType('FilterItemInput')
+export class FilterItemInput extends PartialType(UpdateItemInput) {}

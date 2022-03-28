@@ -26,16 +26,7 @@ export class OrderResolver {
     @Args({ name: 'filter', type: () => FilterOrderInput, nullable: true })
     filter: FilterOrderInput,
   ): Promise<OrdersDto> {
-    const { items, meta } = await this.orderService.getPaginatedOrders(
-      options,
-      filter,
-    );
-    return new OrdersDto(
-      items,
-      meta.totalItems,
-      meta.currentPage,
-      options.limit,
-    );
+    return this.orderService.getPaginatedOrders(options, filter);
   }
 
   @Query(() => OrderEntity)

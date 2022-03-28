@@ -59,7 +59,6 @@ type SignedUrl {
 }
 
 type Query {
-  getItemByCode(code: String!): Item!
   getItems: [Item!]!
   getPaginatedOrders(options: CommonFilterOptionInput!, filter: FilterOrderInput): Orders!
   getOrderById(id: Int!): Order!
