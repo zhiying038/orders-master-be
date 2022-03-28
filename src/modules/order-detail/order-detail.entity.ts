@@ -13,11 +13,9 @@ import { ItemEntity } from '../item/item.entity';
 @ObjectType('OrderDetail')
 export class OrderDetailEntity {
   @PrimaryGeneratedColumn('uuid', { name: 'Id' })
-  @Field()
   id: string;
 
   @Column({ name: 'UnitPrice', type: 'float' })
-  @Field(() => Float)
   unitPrice: number;
 
   @Column({ name: 'Quantity', type: 'int' })
@@ -26,13 +24,11 @@ export class OrderDetailEntity {
 
   @ManyToOne(() => ItemEntity)
   @JoinColumn({ name: 'ItemCode' })
-  @Field(() => ItemEntity)
   item: ItemEntity;
 
   @ManyToOne(() => OrderEntity, (order) => order.orderDetails, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'OrderId' })
-  @Field(() => OrderEntity)
   order: OrderEntity;
 }
