@@ -22,4 +22,8 @@ export class UpdateItemInput extends PartialType(CreateItemInput) {
 }
 
 @InputType('FilterItemInput')
-export class FilterItemInput extends PartialType(UpdateItemInput) {}
+export class FilterItemInput {
+  code?: string;
+
+  name?: string;
+}

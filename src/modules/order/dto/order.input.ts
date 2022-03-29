@@ -13,7 +13,7 @@ export class PlaceOrderInput {
 
 @InputType('FilterOrderInput')
 export class FilterOrderInput {
-  orderId?: number;
+  referenceNumber?: string;
 
   placedAt?: Date;
 }

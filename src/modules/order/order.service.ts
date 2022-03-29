@@ -8,7 +8,10 @@ import { OrderDetailEntity } from 'src/modules/order-detail/order-detail.entity'
 import { Price } from 'src/utils/price';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { GetItemQuery } from '../item/cqrs/item.query';
-import { GetNewRunningNumberQuery } from '../running-number/cqrs/running-number.query';
+import {
+  GetNewRunningNumberQuery,
+  GetNextAvailableNumberQuery,
+} from '../running-number/cqrs/running-number.query';
 import { FilterOrderInput, PlaceOrderInput } from './dto/order.input';
 import { OrderEntity, OrdersDto } from './order.entity';
 
@@ -62,6 +65,20 @@ export class OrderService {
     });
   }
 
+  async getNextReferenceNumber(): Promise<string> {
+    const purpose = 'ORDER';
+    const refNumber = await this.queryBus.execute(
+      new GetNextAvailableNumberQuery(purpose),
+    );
+    return `#${refNumber.toString().padStart(8, 0)}`;
+  }
+
+  calculateTotalAmount(input: PlaceOrderInput): number {
+    const total =
+      input.orders.reduce((a, b) => a + b.unitPrice * b.quantity, 0) || 0;
+    return Price.formatPrice(total);
+  }
+
   private async createOrder(
     items: OrderDetailEntity[],
     orderDate: Date,
@@ -78,12 +95,6 @@ export class OrderService {
     });
 
     return await this.orderRepository.save(newOrder);
-  }
-
-  calculateTotalAmount(input: PlaceOrderInput): number {
-    const total =
-      input.orders.reduce((a, b) => a + b.unitPrice * b.quantity, 0) || 0;
-    return Price.formatPrice(total);
   }
 
   private async prepareReferenceNumber(): Promise<string> {
@@ -104,10 +115,10 @@ export class OrderService {
       .leftJoinAndSelect('orderDetails.item', 'item');
 
     if (filter) {
-      const { orderId, placedAt } = filter;
-      if (orderId)
-        query.andWhere(`${tableName}.referenceNumber ILIKE :referenceNumber`, {
-          referenceNumber: `%${orderId}%`,
+      const { referenceNumber, placedAt } = filter;
+      if (referenceNumber)
+        query.andWhere(`${tableName}.referenceNumber LIKE :referenceNumber`, {
+          referenceNumber: `%${referenceNumber}%`,
         });
 
       if (placedAt) {

@@ -59,10 +59,11 @@ type SignedUrl {
 }
 
 type Query {
-  getItems: [Item!]!
+  getItems(searchText: String): [Item!]!
   getPaginatedOrders(options: CommonFilterOptionInput!, filter: FilterOrderInput): Orders!
   getOrderById(id: Int!): Order!
   calculateTotalPrice(input: PlaceOrderInput!): Price!
+  getNextReferenceNumber: String!
 }
 
 input CommonFilterOptionInput {
@@ -78,7 +79,7 @@ enum SortOrder {
 }
 
 input FilterOrderInput {
-  orderId: Float
+  referenceNumber: String
   placedAt: DateTime
 }
 

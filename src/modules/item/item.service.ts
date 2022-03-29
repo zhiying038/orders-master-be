@@ -51,8 +51,18 @@ export class ItemService {
     }
   }
 
-  async getItems(): Promise<ItemEntity[]> {
-    return this.itemRepository.find({ relations: ['images'] });
+  async getItems(searchText: string): Promise<ItemEntity[]> {
+    const query = this.itemRepository
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.images', 'images');
+
+    if (searchText) {
+      query
+        .orWhere('item.name LIKE :name', { name: `%${searchText}%` })
+        .orWhere('item.code LIKE :code', { code: `%${searchText}%` });
+    }
+
+    return await query.getMany();
   }
 
   async findOne(

@@ -43,4 +43,9 @@ export class OrderResolver {
     const total = this.orderService.calculateTotalAmount(input);
     return { currency: 'MYR', price: total };
   }
+
+  @Query(() => String)
+  async getNextReferenceNumber(): Promise<string> {
+    return this.orderService.getNextReferenceNumber();
+  }
 }

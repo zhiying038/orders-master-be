@@ -25,7 +25,10 @@ export class ItemResolver {
   }
 
   @Query(() => [ItemEntity])
-  async getItems(): Promise<ItemEntity[]> {
-    return this.itemService.getItems();
+  async getItems(
+    @Args({ name: 'searchText', type: () => String, nullable: true })
+    searchText: string,
+  ): Promise<ItemEntity[]> {
+    return this.itemService.getItems(searchText);
   }
 }
