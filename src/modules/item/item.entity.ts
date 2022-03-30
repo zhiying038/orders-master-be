@@ -1,5 +1,11 @@
 import { ObjectType } from '@nestjs/graphql';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ItemImageEntity } from './item-image/item-image.entity';
 
 @Entity({ name: 'ITEMS' })
@@ -8,9 +14,11 @@ export class ItemEntity {
   @PrimaryGeneratedColumn('uuid', { name: 'Id' })
   id: string;
 
-  @Column({ name: 'Code' })
+  @Index()
+  @Column({ name: 'Code', unique: true })
   code: string;
 
+  @Index()
   @Column({ name: 'Name' })
   name: string;
 
