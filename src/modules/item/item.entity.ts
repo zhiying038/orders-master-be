@@ -22,6 +22,9 @@ export class ItemEntity {
   @Column({ name: 'Name' })
   name: string;
 
+  @Column({ name: 'Description', nullable: true })
+  description?: string;
+
   @Column({ name: 'Price', type: 'float' })
   price: number;
 

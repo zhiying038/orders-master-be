@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
@@ -12,7 +12,11 @@ import {
   GetNewRunningNumberQuery,
   GetNextAvailableNumberQuery,
 } from '../running-number/cqrs/running-number.query';
-import { FilterOrderInput, PlaceOrderInput } from './dto/order.input';
+import {
+  FilterOrderInput,
+  PlaceOrderInput,
+  UpdateOrderInput,
+} from './dto/order.input';
 import { OrderEntity, OrdersDto } from './order.entity';
 
 @Injectable()
@@ -71,6 +75,20 @@ export class OrderService {
       new GetNextAvailableNumberQuery(purpose),
     );
     return `#${refNumber.toString().padStart(8, 0)}`;
+  }
+
+  async updateOrder(input: UpdateOrderInput): Promise<OrderEntity> {
+    const { id, ...restInputs } = input;
+
+    const order = await this.orderRepository.findOne({ id: input.id });
+    if (!order) {
+      throw new NotFoundException('Failed to find order');
+    }
+
+    const updated = { ...order, ...restInputs };
+    const result = await this.orderRepository.save(updated);
+
+    return result;
   }
 
   calculateTotalAmount(input: PlaceOrderInput): number {

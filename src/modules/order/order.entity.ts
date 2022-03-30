@@ -1,4 +1,5 @@
 import { ObjectType } from '@nestjs/graphql';
+import { OrderStatus } from 'src/common/constants/order-status';
 import { PaginatedResponseDto } from 'src/common/dto/paginated.dto';
 import { OrderDetailEntity } from 'src/modules/order-detail/order-detail.entity';
 import {
@@ -29,6 +30,14 @@ export class OrderEntity {
 
   @Column({ default: 'MYR', name: 'Currency' })
   currency: string;
+
+  @Column({
+    name: 'Status',
+    type: 'simple-enum',
+    enum: Object.values(OrderStatus),
+    default: OrderStatus.CONFIRMED,
+  })
+  status: string;
 
   @OneToMany(() => OrderDetailEntity, (detail) => detail.order, {
     cascade: true,

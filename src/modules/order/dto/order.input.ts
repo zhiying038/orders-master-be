@@ -1,4 +1,4 @@
-import { InputType } from '@nestjs/graphql';
+import { InputType, PickType } from '@nestjs/graphql';
 import { Allow } from 'class-validator';
 import { CreateOrderDetailInput } from 'src/modules/order-detail/dto/order-detail.input';
 
@@ -9,6 +9,17 @@ export class PlaceOrderInput {
 
   @Allow()
   orders: CreateOrderDetailInput[];
+}
+
+@InputType('UpdateOrderInput')
+export class UpdateOrderInput extends PickType(PlaceOrderInput, [
+  'placedAt',
+] as const) {
+  @Allow()
+  id: string;
+
+  @Allow()
+  status?: string;
 }
 
 @InputType('FilterOrderInput')

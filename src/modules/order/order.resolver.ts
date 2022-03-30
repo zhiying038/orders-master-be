@@ -1,7 +1,11 @@
 import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
 import { CommonFilterOptionInput } from 'src/common/dto/common-filter.input';
 import { PriceDto } from 'src/common/dto/price.dto';
-import { FilterOrderInput, PlaceOrderInput } from './dto/order.input';
+import {
+  FilterOrderInput,
+  PlaceOrderInput,
+  UpdateOrderInput,
+} from './dto/order.input';
 import { OrderEntity, OrdersDto } from './order.entity';
 import { OrderService } from './order.service';
 
@@ -14,6 +18,13 @@ export class OrderResolver {
     @Args('input') input: PlaceOrderInput,
   ): Promise<OrderEntity> {
     return this.orderService.placeOrder(input);
+  }
+
+  @Mutation(() => OrderEntity)
+  async updateOrder(
+    @Args('input') input: UpdateOrderInput,
+  ): Promise<OrderEntity> {
+    return this.orderService.updateOrder(input);
   }
 
   @Query(() => OrdersDto)
