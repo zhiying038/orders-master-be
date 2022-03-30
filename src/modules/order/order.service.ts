@@ -63,9 +63,13 @@ export class OrderService {
     );
   }
 
-  async getOrderById(id: number): Promise<OrderEntity> {
+  async getOrderById(id: string): Promise<OrderEntity> {
     return this.orderRepository.findOne(id, {
-      relations: ['orderDetails', 'orderDetails.item'],
+      relations: [
+        'orderDetails',
+        'orderDetails.item',
+        'orderDetails.item.images',
+      ],
     });
   }
 

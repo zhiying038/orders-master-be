@@ -63,7 +63,7 @@ type SignedUrl {
 type Query {
   getItems(searchText: String): [Item!]!
   getPaginatedOrders(options: CommonFilterOptionInput!, filter: FilterOrderInput): Orders!
-  getOrderById(id: Int!): Order!
+  getOrderById(id: String!): Order!
   calculateTotalPrice(input: PlaceOrderInput!): Price!
   getNextReferenceNumber: String!
 }

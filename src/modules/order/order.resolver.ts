@@ -41,9 +41,7 @@ export class OrderResolver {
   }
 
   @Query(() => OrderEntity)
-  async getOrderById(
-    @Args({ name: 'id', type: () => Int }) id: number,
-  ): Promise<OrderEntity> {
+  async getOrderById(@Args('id') id: string): Promise<OrderEntity> {
     return this.orderService.getOrderById(id);
   }
 

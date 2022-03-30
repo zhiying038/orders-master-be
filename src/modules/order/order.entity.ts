@@ -1,8 +1,10 @@
 import { ObjectType } from '@nestjs/graphql';
+import * as moment from 'moment';
 import { OrderStatus } from 'src/common/constants/order-status';
 import { PaginatedResponseDto } from 'src/common/dto/paginated.dto';
 import { OrderDetailEntity } from 'src/modules/order-detail/order-detail.entity';
 import {
+  AfterLoad,
   Column,
   CreateDateColumn,
   Entity,
@@ -43,6 +45,11 @@ export class OrderEntity {
     cascade: true,
   })
   orderDetails?: OrderDetailEntity[];
+
+  @AfterLoad()
+  convertDate() {
+    this.placedAt = moment(this.placedAt).toDate();
+  }
 }
 
 @ObjectType('Orders')
