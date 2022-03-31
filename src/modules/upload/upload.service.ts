@@ -50,6 +50,7 @@ export class UploadService {
         Key: filePath,
         Expires: 3600,
         ContentType: mimeType,
+        ACL: 'public-read',
       });
 
       const results = new SignedUrlDto();
